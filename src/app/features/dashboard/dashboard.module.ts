@@ -8,11 +8,18 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatIconModule} from '@angular/material/icon';
 import { UsersModule } from './users/users.module';
+import {MatListModule} from '@angular/material/list';
+import { InscripcionesComponent } from './inscripciones/inscripciones.component';
+import { MatTableModule } from '@angular/material/table';
+
+
 
 
 @NgModule({
   declarations: [
-    DashboardComponent
+    DashboardComponent,
+    InscripcionesComponent,
+
   ],
   imports: [
     CommonModule,
@@ -22,6 +29,8 @@ import { UsersModule } from './users/users.module';
     MatToolbarModule,
     MatIconModule,
     UsersModule,
+    MatListModule,
+    MatTableModule,
   ],
   exports:[DashboardComponent],
 })

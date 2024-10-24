@@ -12,6 +12,7 @@ import { UserFullNamePipe } from './pipes/user-full-name.pipe';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
 import { FontSizeDirective } from './directives/font-size.directive';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 
 
@@ -26,6 +27,7 @@ import { FontSizeDirective } from './directives/font-size.directive';
     CommonModule
   ],
   exports:[
+    MatProgressSpinnerModule,
     MatButtonModule,
     MatIconModule,
     MatCardModule,

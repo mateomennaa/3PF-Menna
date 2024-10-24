@@ -1,0 +1,33 @@
+<h2 mat-dialog-title>Agregar Inscripción</h2>
+<mat-dialog-content>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <mat-form-field appearance="fill">
+      <mat-label>Curso</mat-label>
+      <input matInput formControlName="curso" required>
+      <mat-error *ngIf="form.get('curso')?.hasError('required')">
+        El curso es requerido.
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Nombre</mat-label>
+      <input matInput formControlName="name" required>
+      <mat-error *ngIf="form.get('name')?.hasError('required')">
+        El nombre es requerido.
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Apellido</mat-label>
+      <input matInput formControlName="lastName" required>
+      <mat-error *ngIf="form.get('lastName')?.hasError('required')">
+        El apellido es requerido.
+      </mat-error>
+    </mat-form-field>
+    
+    <div mat-dialog-actions>
+      <button mat-button (click)="onCancel()">Cancelar</button>
+      <button mat-button type="submit" [disabled]="form.invalid">Agregar</button>
+    </div>
+  </form>
+</mat-dialog-content>

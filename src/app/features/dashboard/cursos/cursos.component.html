@@ -1,0 +1,13 @@
+
+<h3>Cursos</h3>
+<form [formGroup]="cursoForm" (ngSubmit)="handleSubmit()">
+    <mat-form-field>
+      <mat-label>Nombre del curso</mat-label>
+      <input formControlName="name" matInput placeholder="curso" />
+      <button type="submit" matSuffix mat-icon-button>
+        <mat-icon>{{isEditing ? 'edit' : 'add' }}</mat-icon>
+      </button>
+    </mat-form-field>
+  </form>
+  <app-cursos-table (edit)="onEdit($event)" (delete)="onDelete($event)" [cursos]="cursos"></app-cursos-table>
+
