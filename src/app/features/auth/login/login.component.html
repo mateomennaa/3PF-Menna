@@ -1,1 +1,23 @@
-<p>login works!</p>
+<div class="login-container">
+  <div class="login-box">
+    <h1 class="login-title">Iniciar sesión</h1>
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <mat-form-field class="login-field">
+        <mat-label>Email</mat-label>
+        <input formControlName="email" matInput />
+        <mat-error *ngIf="loginForm.get('email')?.invalid">Ingresa un email válido</mat-error>
+      </mat-form-field>
+
+      <mat-form-field class="login-field">
+        <mat-label>Contraseña</mat-label>
+        <input formControlName="password" [type]="passwordInputType" matInput />
+        <button type="button" (click)="togglePasswordInputType()" matSuffix mat-icon-button>
+          <mat-icon>{{ passwordInputType === 'text' ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        <mat-error *ngIf="loginForm.get('password')?.invalid">La contraseña es requerida</mat-error>
+      </mat-form-field>
+
+      <button type="submit" class="login-button" mat-flat-button color="accent">Ingresar</button>
+    </form>
+  </div>
+</div>

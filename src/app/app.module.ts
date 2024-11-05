@@ -8,7 +8,7 @@ import { DashboardModule } from './features/dashboard/dashboard.module';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { AuthModule } from './features/auth/auth.module';
 import { InscripcionesDialogModule } from './features/dashboard/inscripciones/inscripciones-dialog/inscripciones-dialog.module';
-
+import { HttpClientModule, provideHttpClient, withFetch } from '@angular/common/http';
 
 
 
@@ -21,12 +21,13 @@ import { InscripcionesDialogModule } from './features/dashboard/inscripciones/in
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
-    InscripcionesDialogModule
+    InscripcionesDialogModule,
+    HttpClientModule
 
 
   ],
   providers: [
-    provideAnimationsAsync(), provideNativeDateAdapter()
+    provideAnimationsAsync(), provideNativeDateAdapter(),provideHttpClient(withFetch())
   ],
   bootstrap: [AppComponent]
 })

@@ -25,6 +25,8 @@ export class UsersDialogComponent {
       firstName: [null, [Validators.required]],
       lastName: [null, [Validators.required]],
       email: [null, [Validators.required, Validators.email]],
+      role:[null,Validators.required],
+      password:[null,Validators.required],
     });
     this.patchFormValue();
   }

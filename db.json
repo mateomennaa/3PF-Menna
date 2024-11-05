@@ -1,0 +1,20 @@
+{
+  "users": [
+    {
+      "firstName": "Mateo",
+      "lastName": "Menna",
+      "email": "mateomenna@gmail.com",
+      "password": "123456",
+      "token": "FHSDIUSasdasdaf124234",
+      "role": "admin",
+      "createdAt": "2024-11-04T17:28:34.018Z",
+      "id": "123abc"
+    }
+  ],
+  "cursos": [
+    {
+      "id": "123abc",
+      "curso": "angular"
+    }
+  ]
+}

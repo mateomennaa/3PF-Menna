@@ -7,7 +7,7 @@
                 <mat-label appFontSize>Nombre</mat-label>
                 <input formControlName="firstName" matInput type="text">
                 <mat-error>
-                  @if (userForm.get('firstName')?.hasError('required')){
+                  @if (userForm.get('firstName')?.hasError('required')) {
                     Este campo es requerido
                   }
                 </mat-error>
@@ -18,7 +18,7 @@
                 <mat-label appFontSize>Apellido</mat-label>
                 <input formControlName="lastName" matInput type="text">
                 <mat-error>
-                  @if (userForm.get('lastName')?.hasError('required')){
+                  @if (userForm.get('lastName')?.hasError('required')) {
                     Este campo es requerido
                   }
                 </mat-error>
@@ -29,7 +29,32 @@
                 <mat-label appFontSize>Email</mat-label>
                 <input formControlName="email" matInput type="email">
                 <mat-error>
-                  @if (userForm.get('email')?.hasError('required')){
+                  @if (userForm.get('email')?.hasError('required')) {
+                    Este campo es requerido
+                  }
+                </mat-error>
+              </mat-form-field>
+            </div>
+            <div class="col-6">
+              <mat-form-field class="example-form-field w-100">
+                <mat-label appFontSize>Rol</mat-label>
+                <mat-select formControlName="role">
+                  <mat-option value="admin">Admin</mat-option>
+                  <mat-option value="user">User</mat-option>
+                </mat-select>
+                <mat-error>
+                  @if (userForm.get('role')?.hasError('required')) {
+                    Este campo es requerido
+                  }
+                </mat-error>
+              </mat-form-field>
+            </div>
+            <div class="col-6">
+              <mat-form-field class="example-form-field w-100">
+                <mat-label appFontSize>Password</mat-label>
+                <input formControlName="password" matInput type="password">
+                <mat-error>
+                  @if (userForm.get('password')?.hasError('required')) {
                     Este campo es requerido
                   }
                 </mat-error>
