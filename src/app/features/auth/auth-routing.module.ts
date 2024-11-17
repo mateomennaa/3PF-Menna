@@ -14,7 +14,7 @@ path:'register',
 component:RegisterComponent,
 },
 {
-  path:'***',
+  path:'**',
   redirectTo:'login',
 }
 ];

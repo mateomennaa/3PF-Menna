@@ -1,5 +1,5 @@
 export interface Curso{
     id:string;
-    name:string;
+    nombre:string;
     createdAt:Date;
 }

@@ -1,7 +1,11 @@
+import { Curso } from "../../cursos/models";
+import { User } from "../../users/models";
+
 export interface Inscripcion{
     id:string;
-    curso:string;
-    name:string;
-    lastName:string;
+    cursoId:string;
+    userId:string;
+    user?:User;
+    curso?:Curso;
     createdAt:Date;
 }

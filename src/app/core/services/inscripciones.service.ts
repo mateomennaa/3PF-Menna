@@ -1,51 +1,27 @@
 import { Injectable } from '@angular/core';
-import { Inscripcion } from '../../features/dashboard/inscripciones/models';
-import { generateRandomString } from '../../shared/utils';
-import { Observable, of } from 'rxjs';
-
-let INSCRIPCION_DB: Inscripcion[] = [
-    {
-        id: generateRandomString(4),
-        curso: 'Javascript',
-        name: 'Mateo',
-        lastName: 'Menna',
-        createdAt: new Date(),
-    },
-    {
-        id: generateRandomString(4),
-        curso: 'HTML',
-        name: 'Lionel',
-        lastName: 'Messi',
-        createdAt: new Date(),
-    },
-    {
-        id: generateRandomString(4),
-        curso: 'Angular',
-        name: 'Julian',
-        lastName: 'Alvarez',
-        createdAt: new Date(),
-    },
-];
+import { Observable } from 'rxjs';
+import { Inscripcion } from '../../features/dashboard/inscripciones/models/index';
+import { environment } from '../../../environments/environment';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({ providedIn: 'root' })
 export class InscripcionesService {
-    
-    getInscripciones(): Observable<Inscripcion[]> {
-        return of([...INSCRIPCION_DB]);
-    }
+  constructor(private httpClient: HttpClient) {}
 
-    addInscripcion(inscripcion: Inscripcion): void {
-        INSCRIPCION_DB.push(inscripcion);
-    }
+  deleteInscripcion(id: number): Observable<void> {
+    return this.httpClient.delete<void>(`${environment.apiBaseURL}/inscripciones/${id}`);
+  }
 
-    updateInscripcion(updatedInscripcion: Inscripcion): void {
-        const index = INSCRIPCION_DB.findIndex(ins => ins.id === updatedInscripcion.id);
-        if (index !== -1) {
-            INSCRIPCION_DB[index] = updatedInscripcion;
-        }
-    }
+  getSales(): Observable<Inscripcion[]> {
+    return this.httpClient.get<Inscripcion[]>(
+      `${environment.apiBaseURL}/inscripciones?_embed=user&_embed=cursos`
+    );
+  }
 
-    deleteInscripcion(id: string): void {
-        INSCRIPCION_DB = INSCRIPCION_DB.filter(ins => ins.id !== id);
-    }
+  createInscripcion(payload: { cursoId: string; userId: string }): Observable<Inscripcion> {
+    return this.httpClient.post<Inscripcion>(
+      `${environment.apiBaseURL}/inscripciones`,
+      payload
+    );
+  }
 }

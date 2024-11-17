@@ -1,71 +1,66 @@
 import { Component, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { MatTableDataSource } from '@angular/material/table';
-import { Inscripcion } from './models'; 
-import { InscripcionesService } from '../../../core/services/inscripciones.service'; 
-import { generateRandomString } from '../../../shared/utils';
-import { AddInscripcionDialog } from './inscripciones-dialog/inscripciones-dialog.component';
+import { Store } from '@ngrx/store';
+import { InscripcionActions } from './store/inscripcion.actions';
+import { Observable } from 'rxjs';
+import { selectIsLoadingInscripciones, selectLoadInscripcionesError, selectCursoOptions, selectInscripciones, selectUserOptions } from './store/inscripcion.selectors';
+import { Curso } from '../cursos/models';
+import { User } from '../users/models';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Inscripcion } from './models/index';
+import { map } from 'rxjs';
 
 @Component({
-  selector: 'app-inscripciones',
+  selector: 'app-incripciones',
   templateUrl: './inscripciones.component.html',
   styleUrls: ['./inscripciones.component.scss']
 })
 export class InscripcionesComponent implements OnInit {
-  displayedColumns: string[] = ['id', 'curso', 'name', 'lastName', 'createdAt', 'actions'];
-  dataSource: MatTableDataSource<Inscripcion> = new MatTableDataSource<Inscripcion>([]); 
+  Inscripciones$: Observable<Inscripcion[]>;
+  userOptions$: Observable<User[]>;
+  cursoOptions$: Observable<Curso[]>;
+  loadInscripcionesError$: Observable<Error | null>;
+  isLoadingInscripciones$: Observable<boolean>;
 
-  constructor(private inscripcionesService: InscripcionesService, public dialog: MatDialog) {}
+  displayedColumns: string[] = ['id', 'firstName', 'lastName', 'cursoId', 'fechaCreacion', 'actions'];
+  InscripcionForm: FormGroup;
+
+  constructor(private store: Store, private formBuilder: FormBuilder) {
+    this.InscripcionForm = this.formBuilder.group({
+      cursoId: [null, [Validators.required]],
+      userId: [null, [Validators.required]],
+    });
+
+    this.Inscripciones$ = this.store.select(selectInscripciones).pipe(
+      map(inscripciones => inscripciones || [])
+    ) as Observable<Inscripcion[]>;
+    this.cursoOptions$ = this.store.select(selectCursoOptions);
+    this.userOptions$ = this.store.select(selectUserOptions);
+    this.isLoadingInscripciones$ = this.store.select(selectIsLoadingInscripciones);
+    this.loadInscripcionesError$ = this.store.select(selectLoadInscripcionesError);
+  }
 
   ngOnInit(): void {
-    this.inscripcionesService.getInscripciones().subscribe(data => {
-      this.dataSource.data = data;
+    this.store.dispatch(InscripcionActions.loadInscripcion());
+    this.store.dispatch(InscripcionActions.loadCursosAndUserOptions());
+  }
+
+  onSubmit(): void {
+    if (this.InscripcionForm.invalid) {
+      this.InscripcionForm.markAllAsTouched();
+    } else {
+      this.store.dispatch(InscripcionActions.createInscripcion(this.InscripcionForm.value));
+      this.InscripcionForm.reset();
+    }
+  }
+
+  onEdit(inscripcion: Inscripcion): void {
+    this.InscripcionForm.setValue({
+      cursoId: inscripcion.cursoId,
+      userId: inscripcion.userId
     });
   }
 
-  deleteInscripcion(id: string): void {
-    this.inscripcionesService.deleteInscripcion(id);
-    this.dataSource.data = this.dataSource.data.filter(inscripcion => inscripcion.id !== id);
-  }
-
-  openAddDialog(): void {
-    const dialogRef = this.dialog.open(AddInscripcionDialog);
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        const newInscripcion: Inscripcion = {
-          id: generateRandomString(4),
-          curso: result.curso,
-          name: result.name,
-          lastName: result.lastName,
-          createdAt: new Date(),
-        };
-        this.inscripcionesService.addInscripcion(newInscripcion);
-        this.dataSource.data = [...this.dataSource.data, newInscripcion];
-      }
-    });
-  }
-
-  openEditDialog(inscripcion: Inscripcion): void {
-    const dialogRef = this.dialog.open(AddInscripcionDialog, {
-      data: { editingInscripcion: inscripcion },
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        const updatedInscripcion: Inscripcion = {
-          id: inscripcion.id,
-          curso: result.curso,
-          name: result.name,
-          lastName: result.lastName,
-          createdAt: inscripcion.createdAt,
-        };
-        this.inscripcionesService.updateInscripcion(updatedInscripcion);
-        const index = this.dataSource.data.findIndex(i => i.id === inscripcion.id);
-        if (index > -1) {
-          this.dataSource.data[index] = updatedInscripcion;
-        }
-      }
-    });
+  onDelete(inscripcionId: number): void {
+    this.store.dispatch(InscripcionActions.deleteInscripcion({ id: inscripcionId }));
   }
 }

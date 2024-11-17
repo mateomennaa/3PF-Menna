@@ -1,35 +1,47 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { UsersDialogComponent } from './users-dialog/users-dialog.component';
 import { User } from './models';
 import { UsersService } from '../../../core/services/users.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-users',
   templateUrl: './users.component.html',
-  styleUrl: './users.component.scss',
+  styleUrls: ['./users.component.scss'],
 })
 export class UsersComponent implements OnInit {
-  displayedColumns: string[] = ['id', 'name', 'email', 'createdAt', 'actions'];
+goToDetail(arg0: any) {
+throw new Error('Method not implemented.');
+}
+  displayedColumns: string[] = ['id', 'name', 'email', 'role', 'createdAt', 'actions'];
   dataSource: User[] = [];
 
   isLoading = false;
-
-  usuario = {
-    nombre: 'Josue',
-    apellido: 'Baez',
-  };
+  authUser$: Observable<User | null>;
+  currentUserRole: string | null = null; // Para almacenar el rol del usuario autenticado
 
   constructor(
     private matDialog: MatDialog,
     private usersService: UsersService,
     private router: Router,
-    private activatedRoute: ActivatedRoute
-  ) {}
+    private activatedRoute: ActivatedRoute,
+    private authService: AuthService
+  ) {
+    this.authUser$ = this.authService.authUser$;
+  }
 
   ngOnInit(): void {
     this.loadUsers();
+
+    // Obtener el rol del usuario autenticado
+    this.authUser$.subscribe((user) => {
+      if (user) {
+        this.currentUserRole = user.role;
+      }
+    });
   }
 
   loadUsers(): void {
@@ -48,13 +60,14 @@ export class UsersComponent implements OnInit {
   }
 
   onDelete(id: string) {
-    if (confirm('Esta seguro?')) {
+    if (this.currentUserRole !== 'admin') return; // Solo permitir a los admin borrar
+    if (confirm('¿Está seguro?')) {
       this.isLoading = true;
       this.usersService.removeUserById(id).subscribe({
         next: (users) => {
           this.dataSource = users;
         },
-        error: (err) => {
+        error: () => {
           this.isLoading = false;
         },
         complete: () => {
@@ -64,18 +77,12 @@ export class UsersComponent implements OnInit {
     }
   }
 
-  goToDetail(id: string): void {
-    this.router.navigate([id, 'detail'], {
-      relativeTo: this.activatedRoute,
-    });
-  }
-
   openModal(editingUser?: User): void {
+    if (this.currentUserRole !== 'admin') return; // Solo permitir a los admin abrir el modal de creación
+
     this.matDialog
       .open(UsersDialogComponent, {
-        data: {
-          editingUser,
-        },
+        data: { editingUser },
       })
       .afterClosed()
       .subscribe({
@@ -84,9 +91,9 @@ export class UsersComponent implements OnInit {
             if (editingUser) {
               this.handleUpdate(editingUser.id, result);
             } else {
-              this.usersService
-                .createUser(result)
-                .subscribe({ next: () => this.loadUsers() });
+              this.usersService.createUser(result).subscribe({
+                next: () => this.loadUsers(),
+              });
             }
           }
         },
@@ -94,12 +101,13 @@ export class UsersComponent implements OnInit {
   }
 
   handleUpdate(id: string, update: User): void {
+    if (this.currentUserRole !== 'admin') return; // Solo permitir a los admin actualizar usuarios
     this.isLoading = true;
     this.usersService.updateUserById(id, update).subscribe({
       next: (users) => {
         this.dataSource = users;
       },
-      error: (err) => {
+      error: () => {
         this.isLoading = false;
       },
       complete: () => {
@@ -107,4 +115,5 @@ export class UsersComponent implements OnInit {
       },
     });
   }
+  
 }

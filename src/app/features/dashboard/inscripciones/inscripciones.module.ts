@@ -1,27 +1,22 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { ReactiveFormsModule } from '@angular/forms';
-import { InscripcionesRoutingModule } from './inscripciones-routing.module';
-import { InscripcionesDialogModule } from './inscripciones-dialog/inscripciones-dialog.module';
-
-
+import { InscripcionesRoutingModule } from './inscripciones-routing.module'; 
+import { InscripcionesComponent } from './inscripciones.component';
+import { EffectsModule } from '@ngrx/effects';
+import { InscripcionEffects } from './store/inscripcion.effects'; 
+import { StoreModule } from '@ngrx/store';
+import { inscripcionFeature } from './store/inscripcion.reducer';
+import { SharedModule } from '../../../shared/shared.module';
 
 
 @NgModule({
-  declarations: [
-
-  ],
+  declarations: [InscripcionesComponent],
   imports: [
     CommonModule,
+    SharedModule,
     InscripcionesRoutingModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    ReactiveFormsModule,
-    InscripcionesDialogModule
-  ]
+    StoreModule.forFeature(inscripcionFeature),
+    EffectsModule.forFeature([InscripcionEffects]),
+  ],
 })
-export class InscripcionesModule { }
+export class InscripcionesModule {}

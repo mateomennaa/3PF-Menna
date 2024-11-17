@@ -1,56 +1,81 @@
-<h3>Inscripciones</h3>
-<button mat-button (click)="openAddDialog()">
-    <mat-icon>
-      add
-    </mat-icon>
-    Agregar 
-  </button>
-
-
-<table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
-
-    ->
-    <ng-container matColumnDef="id">
-      <th mat-header-cell *matHeaderCellDef> ID </th>
-      <td mat-cell *matCellDef="let element"> {{element.id}} </td>
-    </ng-container>
+<!-- Form for creating inscription - Moved to top -->
+<div class="mb-4 p-4 bg-white rounded shadow">
+    <h2 class="text-xl mb-4">Nueva Inscripción</h2>
+    <form [formGroup]="InscripcionForm" (ngSubmit)="onSubmit()" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <mat-form-field>
+        <mat-label>Curso</mat-label>
+        <mat-select formControlName="cursoId" required>
+          <mat-option *ngFor="let curso of cursoOptions$ | async" [value]="curso.id">
+            {{ curso.nombre }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
   
-    
-    <ng-container matColumnDef="curso">
-      <th mat-header-cell *matHeaderCellDef> Curso </th>
-      <td mat-cell *matCellDef="let element"> {{element.curso}} </td>
-    </ng-container>
+      <mat-form-field>
+        <mat-label>Usuario</mat-label>
+        <mat-select formControlName="userId" required>
+          <mat-option *ngFor="let user of userOptions$ | async" [value]="user.id">
+            {{ user.firstName }} {{ user.lastName }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
   
-    
-    <ng-container matColumnDef="name">
-      <th mat-header-cell *matHeaderCellDef> Nombre </th>
-      <td mat-cell *matCellDef="let element"> {{element.name}} </td>
-    </ng-container>
+      <div class="md:col-span-2">
+        <button mat-raised-button color="primary" type="submit">Agregar Inscripción</button>
+      </div>
+    </form>
+  </div>
   
-
-    <ng-container matColumnDef="lastName">
-      <th mat-header-cell *matHeaderCellDef> Apellido </th>
-      <td mat-cell *matCellDef="let element"> {{element.lastName}} </td>
-    </ng-container>
+  <!-- Loading and Error States -->
+  <div *ngIf="isLoadingInscripciones$ | async" class="p-4">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
   
-   
-    <ng-container matColumnDef="createdAt">
-      <th mat-header-cell *matHeaderCellDef> Fecha Creación </th>
-      <td mat-cell *matCellDef="let element"> {{element.createdAt | date}} </td>
-    </ng-container>
+  <div *ngIf="loadInscripcionesError$ | async as error" class="p-4 text-red-600">
+    <p>Error al cargar inscripciones: {{ error.message }}</p>
+  </div>
   
-    
-    <ng-container matColumnDef="actions">
-      <th mat-header-cell *matHeaderCellDef> Acciones </th>
-      <td mat-cell *matCellDef="let element">
-        <button mat-icon-button (click)="deleteInscripcion(element.id)">
-          <mat-icon>delete</mat-icon>
-        </button>
-      </td>
-    </ng-container>
+  <!-- Inscriptions Table -->
+  <div class="mat-elevation-z8">
+    <table mat-table [dataSource]="(Inscripciones$ | async) || []" class="w-full">
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef> ID </th>
+        <td mat-cell *matCellDef="let inscripcion"> {{ inscripcion.id }} </td>
+      </ng-container>
   
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-  </table>
+      <ng-container matColumnDef="firstName">
+        <th mat-header-cell *matHeaderCellDef> Nombre </th>
+        <td mat-cell *matCellDef="let inscripcion"> {{ inscripcion.user?.firstName }} </td>
+      </ng-container>
   
+      <ng-container matColumnDef="lastName">
+        <th mat-header-cell *matHeaderCellDef> Apellido </th>
+        <td mat-cell *matCellDef="let inscripcion"> {{ inscripcion.user?.lastName }} </td>
+      </ng-container>
   
+      <ng-container matColumnDef="cursoId">
+        <th mat-header-cell *matHeaderCellDef> Curso </th>
+        <td mat-cell *matCellDef="let inscripcion"> {{ inscripcion.curso?.nombre }} </td>
+      </ng-container>
+  
+      <ng-container matColumnDef="fechaCreacion">
+        <th mat-header-cell *matHeaderCellDef> Fecha de Creación </th>
+        <td mat-cell *matCellDef="let inscripcion"> {{ inscripcion.fechaCreacion | date:'dd/MM/yyyy' }} </td>
+      </ng-container>
+  
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef> Acciones </th>
+        <td mat-cell *matCellDef="let inscripcion">
+          <button mat-icon-button color="primary" (click)="onEdit(inscripcion)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="onDelete(inscripcion.id)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+  
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  </div>

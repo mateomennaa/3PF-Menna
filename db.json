@@ -9,12 +9,43 @@
       "role": "admin",
       "createdAt": "2024-11-04T17:28:34.018Z",
       "id": "123abc"
+    },
+    {
+      "id": "Qete",
+      "firstName": "MATEO",
+      "lastName": "MENNA",
+      "email": "mateomennaaa@gmail.com",
+      "role": "user",
+      "password": "123",
+      "createdAt": "2024-11-14T02:48:09.942Z",
+      "token": "IvDUXcQCcscL47nezqpd"
     }
   ],
   "cursos": [
     {
-      "id": "123abc",
-      "curso": "angular"
+      "id": "125abc",
+      "nombre": "angular"
+    },
+    {
+      "id": "135abc",
+      "nombre": "JavaScript"
+    }
+  ],
+  "inscripciones": [
+    {
+      "id": "5cdd",
+      "cursoId": "125abc",
+      "userId": "123abc"
+    },
+    {
+      "id": "238a",
+      "cursoId": "135abc",
+      "userId": "123abc"
+    },
+    {
+      "id": "8fc6",
+      "cursoId": "125abc",
+      "userId": "Qete"
     }
   ]
 }
