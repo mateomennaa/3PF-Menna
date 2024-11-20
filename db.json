@@ -24,22 +24,19 @@
   "cursos": [
     {
       "id": "125abc",
-      "nombre": "angular"
+      "nombre": "angular",
+      "createdAt": "2024-11-04T17:28:34.018Z"
     },
     {
       "id": "135abc",
-      "nombre": "JavaScript"
+      "nombre": "JavaScript",
+      "createdAt": "2024-11-04T17:28:34.018Z"
     }
   ],
   "inscripciones": [
     {
       "id": "5cdd",
       "cursoId": "125abc",
-      "userId": "123abc"
-    },
-    {
-      "id": "238a",
-      "cursoId": "135abc",
       "userId": "123abc"
     },
     {

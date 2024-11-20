@@ -6,7 +6,7 @@
         <mat-label>Curso</mat-label>
         <mat-select formControlName="cursoId" required>
           <mat-option *ngFor="let curso of cursoOptions$ | async" [value]="curso.id">
-            {{ curso.nombre }}
+            {{ curso.nombre}}
           </mat-option>
         </mat-select>
       </mat-form-field>
@@ -26,7 +26,6 @@
     </form>
   </div>
   
-  <!-- Loading and Error States -->
   <div *ngIf="isLoadingInscripciones$ | async" class="p-4">
     <mat-spinner diameter="40"></mat-spinner>
   </div>
@@ -35,7 +34,6 @@
     <p>Error al cargar inscripciones: {{ error.message }}</p>
   </div>
   
-  <!-- Inscriptions Table -->
   <div class="mat-elevation-z8">
     <table mat-table [dataSource]="(Inscripciones$ | async) || []" class="w-full">
       <ng-container matColumnDef="id">

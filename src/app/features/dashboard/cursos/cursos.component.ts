@@ -15,7 +15,7 @@ export class CursosComponent implements OnInit {
 
   constructor(private cursosService: cursosService, private fb: FormBuilder) {
     this.cursoForm = this.fb.group({
-      name: ['', Validators.required],
+      nombre: ['', Validators.required],
     });
   }
 
@@ -26,11 +26,16 @@ export class CursosComponent implements OnInit {
   loadCursos(): void {
     this.cursosService.getCursos().subscribe({
       next: (cursos) => {
-        this.cursos = cursos;
+        console.log('Cursos recibidos:', cursos); 
+        this.cursos = cursos.map(curso => ({
+          ...curso,
+          createdAt: new Date(curso.createdAt) 
+        }));
         this.isEditing = undefined;
       },
     });
   }
+  
 
   onCreate(): void {
     if (this.cursoForm.invalid) {
@@ -38,12 +43,19 @@ export class CursosComponent implements OnInit {
     } else {
       this.cursosService.createCurso(this.cursoForm.value).subscribe({
         next: (cursoCreated) => {
-          this.cursos = [...this.cursos, cursoCreated];
+          if (!this.cursos.find(c => c.id === cursoCreated.id)) {
+            this.cursos = [...this.cursos, cursoCreated];
+          }
           this.cursoForm.reset();
         },
+        error: (err) => {
+          console.error(err);
+        }
       });
     }
   }
+  
+  
 
   onEdit(curso: Curso): void {
     this.isEditing = curso;
@@ -55,34 +67,29 @@ export class CursosComponent implements OnInit {
       this.cursoForm.markAllAsTouched();
       return;
     }
-  
+
     if (this.isEditing) {
-      
       this.cursosService.editCurso(this.isEditing.id, this.cursoForm.value).subscribe({
         next: (updatedCurso) => {
-          
           this.cursos = this.cursos.map((curso) =>
             curso.id === updatedCurso.id ? updatedCurso : curso
           );
-          this.isEditing = undefined; 
-          this.cursoForm.reset(); 
+          this.isEditing = undefined;
+          this.cursoForm.reset();
         }
       });
     } else {
-
       this.onCreate();
     }
   }
-  
 
   onDelete(id: string): void {
     this.cursosService.deleteCurso(id).subscribe({
       next: () => {
-        // Filtrar el curso eliminado del array local
         this.cursos = this.cursos.filter((curso) => curso.id !== id);
       },
       error: (err) => {
-        console.error(err); // Manejo de errores
+        console.error(err);
       },
     });
   }

@@ -1,13 +1,20 @@
-
-<h3>Cursos</h3>
-<form [formGroup]="cursoForm" (ngSubmit)="handleSubmit()">
+<mat-card>
+  <h3>Cursos</h3>
+  <form [formGroup]="cursoForm" (ngSubmit)="handleSubmit()">
     <mat-form-field>
       <mat-label>Nombre del curso</mat-label>
-      <input formControlName="name" matInput placeholder="curso" />
-      <button type="submit" matSuffix mat-icon-button>
-        <mat-icon>{{isEditing ? 'edit' : 'add' }}</mat-icon>
+      <input formControlName="nombre" matInput placeholder="Curso" />
+      <mat-error *ngIf="cursoForm.get('nombre')?.invalid && cursoForm.get('nombre')?.touched">
+        El nombre del curso es obligatorio
+      </mat-error>
+      <button type="submit" matSuffix mat-icon-button [attr.aria-label]="isEditing ? 'Actualizar curso' : 'Agregar curso'">
+        <mat-icon>{{ isEditing ? 'edit' : 'add' }}</mat-icon>
       </button>
     </mat-form-field>
   </form>
-  <app-cursos-table (edit)="onEdit($event)" (delete)="onDelete($event)" [cursos]="cursos"></app-cursos-table>
-
+  <app-cursos-table 
+    (edit)="onEdit($event)" 
+    (delete)="onDelete($event)" 
+    [cursos]="cursos">
+  </app-cursos-table>
+</mat-card>

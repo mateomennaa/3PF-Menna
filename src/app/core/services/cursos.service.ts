@@ -1,67 +1,65 @@
-import { Injectable } from "@angular/core";
-import { Observable, of, throwError } from "rxjs";
-
-import { generateRandomString } from "../../shared/utils";
+import { Injectable } from '@angular/core';
+import { Observable, of, BehaviorSubject } from 'rxjs';
 import { Curso } from '../../features/dashboard/cursos/models/index';
-import { CursosComponent } from "../../features/dashboard/cursos/cursos.component";
-import { HttpClient } from "@angular/common/http";
-import { environment } from "../../../environments/environment";
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
+import { tap } from 'rxjs/operators';
+import { generateRandomString } from '../../shared/utils';
 
-let CURSOS_DB: Curso[]=[
-    {
-    id: generateRandomString(4),
-    nombre:'Javascript',
-    createdAt:new Date(),  
-    },
-    {
-    id: generateRandomString(4),
-    nombre:'HTML',
-    createdAt:new Date(),  
-    },
-    {
-    id: generateRandomString(4),
-    nombre:'Angular',
-    createdAt:new Date(),  
-    },
-]
 @Injectable({ providedIn: 'root' })
 export class cursosService {
-  constructor(private httpClient:HttpClient){}
+  private cursosSubject: BehaviorSubject<Curso[]> = new BehaviorSubject<Curso[]>([]);
+
+  constructor(private httpClient: HttpClient) {
+    this.loadCursos();
+  }
+
+  loadCursos(): void {
+    this.httpClient.get<Curso[]>(`${environment.apiBaseURL}/cursos`).subscribe(cursos => {
+      const cursosConFecha = cursos.map(curso => ({
+        ...curso,
+        createdAt: new Date(curso.createdAt)
+      }));
+      this.cursosSubject.next(cursosConFecha);
+    });
+  }
+
   getCursos(): Observable<Curso[]> {
-    return this.httpClient.get<Curso[]>(`${environment.apiBaseURL}/cursos`,)
+    return this.cursosSubject.asObservable();
   }
 
   createCurso(curso: Omit<Curso, 'id' | 'createdAt'>): Observable<Curso> {
-    const cursoCreated = {
+    const cursoCreated: Curso = {
       ...curso,
       id: generateRandomString(4),
-      createdAt: new Date(),
+      createdAt: new Date(),  
     };
-    CURSOS_DB.push(cursoCreated);
-    return of(cursoCreated);
-  }
 
-   editCurso(id: string, curso: Partial<Curso>): Observable<Curso> {
-    let cursoToEdit = CURSOS_DB.find((cur) => cur.id === id);
-    if (!cursoToEdit) {
-    return throwError(() => new Error('No se encontró el curso'));
-    }
-
-    const updatedCurso = { ...cursoToEdit, ...curso };
-
-    CURSOS_DB = CURSOS_DB.map((cur) =>
-    cur.id === id ? updatedCurso : cur
+    return this.httpClient.post<Curso>(`${environment.apiBaseURL}/cursos`, cursoCreated).pipe(
+      tap((newCurso) => {
+        const updatedCursos = [...this.cursosSubject.value, newCurso];
+        this.cursosSubject.next(updatedCursos);
+      })
     );
-
-    return of(updatedCurso); 
   }
-  deleteCurso(id: string): Observable<void> {
-    const cursoToDelete = CURSOS_DB.find((cur) => cur.id === id);
-    if (!cursoToDelete) {
-        return throwError(() => new Error('No se encontró el curso'));
-    }
 
-    CURSOS_DB = CURSOS_DB.filter((cur) => cur.id !== id);
-    return of(undefined);
-}
+  editCurso(id: string, curso: Partial<Curso>): Observable<Curso> {
+    return this.httpClient.put<Curso>(`${environment.apiBaseURL}/cursos/${id}`, curso).pipe(
+      tap((updatedCurso) => {
+        const updatedCursos = this.cursosSubject.value.map((cur) =>
+          cur.id === id ? updatedCurso : cur
+        );
+        this.cursosSubject.next(updatedCursos);
+      })
+    );
+  }
+
+  deleteCurso(id: string): Observable<void> {
+    return this.httpClient.delete<void>(`${environment.apiBaseURL}/cursos/${id}`).pipe(
+      tap(() => {
+        const updatedCursos = this.cursosSubject.value.filter((cur) => cur.id !== id);
+        this.cursosSubject.next(updatedCursos);
+      })
+    );
+  }
 }
